@@ -2,391 +2,349 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <title>PubGolf 🏌️</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
-:root {
-  --bg: #0d0f14;
-  --bg2: #161920;
-  --bg3: #1e222d;
-  --card: #1a1e28;
-  --border: #2a2f3d;
-  --accent: #c8f046;
-  --accent2: #46c8f0;
-  --accent3: #f0864a;
-  --text: #eef0f5;
-  --muted: #6b7280;
-  --danger: #f05a5a;
-  --success: #46c8a0;
-  --radius: 12px;
-  --font-display: 'Bebas Neue', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
+:root{
+  --bg:#0d0f14;--bg2:#161920;--bg3:#1e222d;--card:#1a1e28;
+  --border:#2a2f3d;--accent:#c8f046;--accent2:#46c8f0;--accent3:#f0864a;
+  --text:#eef0f5;--muted:#6b7280;--danger:#f05a5a;--success:#46c8a0;
+  --r:12px;--fd:'Bebas Neue',sans-serif;--fb:'DM Sans',sans-serif;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden}
-h1,h2,h3{font-family:var(--font-display);letter-spacing:.04em}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100%;overflow-x:hidden;padding-bottom:env(safe-area-inset-bottom)}
 
-/* NAV */
-nav{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
-.nav-logo{font-family:var(--font-display);font-size:28px;color:var(--accent);letter-spacing:.08em}
-.nav-logo span{color:var(--text)}
-.nav-tabs{display:flex;gap:4px}
-.nav-tab{padding:8px 16px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-family:var(--font-body);font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
+/* TOP BAR */
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;gap:8px}
+.logo{font-family:var(--fd);font-size:26px;color:var(--accent);letter-spacing:.08em;line-height:1;flex-shrink:0}
+.logo span{color:var(--text)}
+.top-tabs{display:flex;gap:4px}
+.nav-tab{padding:8px 13px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-family:var(--fb);font-size:14px;font-weight:500;cursor:pointer;transition:all .18s;white-space:nowrap}
 .nav-tab:hover{background:var(--bg3);color:var(--text)}
 .nav-tab.active{background:var(--accent);color:#0d0f14;font-weight:600}
-.nav-right{display:flex;align-items:center;gap:10px}
-.live-dot{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success);animation:pulse 2s infinite}
-.live-txt{font-size:12px;color:var(--success);font-weight:500}
+.live-wrap{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.live-dot.on{background:var(--success);box-shadow:0 0 7px var(--success);animation:pulse 2s infinite}
+.live-lbl{font-size:12px;color:var(--muted);font-weight:500}
+.live-lbl.on{color:var(--success)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 /* PAGES */
-.page{display:none;padding:24px;max-width:1200px;margin:0 auto}
+.page{display:none;padding:18px;max-width:1100px;margin:0 auto;padding-bottom:100px}
 .page.active{display:block}
 
-/* CARDS */
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
-.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.card-title{font-family:var(--font-display);font-size:22px;color:var(--accent);letter-spacing:.04em}
-
-/* GRID */
-.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
-.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-
-/* SCOREBOARD */
-.scoreboard-header{display:grid;grid-template-columns:200px repeat(var(--cols,4),1fr) 90px 90px 90px;gap:8px;align-items:center;padding:10px 16px;background:var(--bg3);border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.scoreboard-row{display:grid;grid-template-columns:200px repeat(var(--cols,4),1fr) 90px 90px 90px;gap:8px;align-items:center;padding:10px 16px;border:1px solid var(--border);border-top:none;transition:background .15s}
-.scoreboard-row:last-child{border-radius:0 0 8px 8px}
-.scoreboard-row:hover{background:var(--bg3)}
-.team-cell{display:flex;flex-direction:column;gap:2px}
-.team-name{font-weight:600;font-size:15px}
-.team-players{font-size:12px;color:var(--muted)}
-.score-input{width:52px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--font-body);font-size:14px;text-align:center;padding:6px 4px;transition:border-color .2s}
-.score-input:focus{outline:none;border-color:var(--accent)}
-.hole-label{font-size:11px;color:var(--muted);text-align:center}
-.hole-drink{font-size:11px;color:var(--accent2);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px}
-.total-cell{font-family:var(--font-display);font-size:22px;letter-spacing:.04em}
-.rank-cell{font-family:var(--font-display);font-size:22px}
-.rank-1{color:var(--accent)}
-.rank-2{color:var(--accent2)}
-.rank-3{color:var(--accent3)}
-
-/* MINI GAMES */
-.minigame-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden}
-.minigame-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}
-.mg-title{font-family:var(--font-display);font-size:20px;color:var(--text);margin-bottom:4px}
-.mg-pts{display:inline-block;background:rgba(200,240,70,.15);color:var(--accent);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;margin-bottom:12px}
-.mg-team-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.mg-team-name{flex:1;font-size:14px;font-weight:500}
-.mg-score-input{width:60px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--font-body);font-size:14px;text-align:center;padding:6px;transition:border-color .2s}
-.mg-score-input:focus{outline:none;border-color:var(--accent)}
-
-/* LEADERBOARD */
-.lb-row{display:flex;align-items:center;gap:16px;padding:14px 20px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;transition:all .3s}
-.lb-rank{font-family:var(--font-display);font-size:36px;width:40px;text-align:center}
-.lb-info{flex:1}
-.lb-team{font-size:16px;font-weight:600}
-.lb-players{font-size:13px;color:var(--muted)}
-.lb-scores{display:flex;gap:16px;text-align:right}
-.lb-stat{display:flex;flex-direction:column;align-items:flex-end}
-.lb-stat-val{font-family:var(--font-display);font-size:24px}
-.lb-stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.lb-row:first-child{border-color:var(--accent);background:rgba(200,240,70,.06)}
-
-/* ADMIN */
-.form-group{margin-bottom:16px}
-.form-label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
-.form-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:14px;padding:10px 14px;transition:border-color .2s}
-.form-input:focus{outline:none;border-color:var(--accent)}
-.form-input::placeholder{color:var(--muted)}
-textarea.form-input{resize:vertical;min-height:70px}
-.btn{padding:10px 20px;border-radius:8px;border:none;font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
-.btn-primary{background:var(--accent);color:#0d0f14}
-.btn-primary:hover{background:#d4f55a;transform:translateY(-1px)}
-.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
-.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
-.btn-danger{background:rgba(240,90,90,.15);color:var(--danger);border:1px solid rgba(240,90,90,.3)}
-.btn-danger:hover{background:rgba(240,90,90,.25)}
-.btn-sm{padding:6px 12px;font-size:13px}
-
-/* HOLE ADMIN */
-.hole-admin-row{display:grid;grid-template-columns:50px 1fr 1fr 40px;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
-.hole-num-badge{background:var(--bg3);border:1px solid var(--border);border-radius:6px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:18px;color:var(--accent)}
-
-/* LOGBOOK */
-.log-entry{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);align-items:flex-start}
-.log-time{font-size:12px;color:var(--muted);white-space:nowrap;min-width:90px;font-variant-numeric:tabular-nums}
-.log-msg{font-size:14px;color:var(--text)}
-.log-type{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
-.log-score{background:rgba(200,240,70,.15);color:var(--accent)}
-.log-admin{background:rgba(70,200,240,.15);color:var(--accent2)}
-.log-mini{background:rgba(240,134,74,.15);color:var(--accent3)}
-
-/* PIN MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px)}
-.modal-overlay.hidden{display:none}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:360px;width:100%;text-align:center}
-.modal h2{font-family:var(--font-display);font-size:32px;color:var(--accent);margin-bottom:8px}
-.modal p{color:var(--muted);font-size:14px;margin-bottom:24px}
-.pin-dots{display:flex;justify-content:center;gap:12px;margin-bottom:24px}
-.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);transition:all .2s}
-.pin-dot.filled{background:var(--accent);border-color:var(--accent)}
-.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto}
-.pin-btn{padding:16px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-display);font-size:24px;cursor:pointer;transition:all .2s}
-.pin-btn:hover{border-color:var(--accent);color:var(--accent)}
-.pin-error{color:var(--danger);font-size:13px;margin-top:12px;min-height:20px}
+/* BOTTOM NAV (mobile only) */
+.bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.bnav-inner{display:flex}
+.bn{flex:1;padding:10px 2px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:transparent;color:var(--muted);font-family:var(--fb);font-size:10px;font-weight:500;cursor:pointer}
+.bn.active{color:var(--accent)}
+.bn-ico{font-size:22px;line-height:1}
 
 /* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 20px;font-size:14px;font-weight:500;z-index:300;transform:translateY(80px);opacity:0;transition:all .3s;max-width:300px}
-.toast.show{transform:translateY(0);opacity:1}
-.toast.success{border-color:var(--success);color:var(--success)}
-.toast.error{border-color:var(--danger);color:var(--danger)}
-
-/* SECTION TITLE */
-.section-title{font-family:var(--font-display);font-size:32px;color:var(--text);margin-bottom:6px}
-.section-sub{color:var(--muted);font-size:14px;margin-bottom:24px}
-.divider{border:none;border-top:1px solid var(--border);margin:24px 0}
-
-/* STATUS BAR */
-.status-bar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px}
-.stat-pill{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;display:flex;align-items:center;gap:6px}
-.stat-pill-val{font-family:var(--font-display);font-size:18px;color:var(--accent)}
-
-/* RESPONSIVE */
+.toast{position:fixed;bottom:calc(68px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px 20px;font-size:14px;font-weight:500;z-index:400;opacity:0;transition:all .28s;white-space:nowrap;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.ok{border-color:var(--success);color:var(--success)}
+.toast.err{border-color:var(--danger);color:var(--danger)}
+@media(min-width:701px){
+  .bnav{display:none!important}
+  .toast{bottom:24px}
+}
 @media(max-width:700px){
-  .scoreboard-header,.scoreboard-row{grid-template-columns:120px repeat(var(--cols,4),44px) 70px 70px 70px;font-size:12px}
-  .score-input{width:40px;font-size:12px}
-  nav{padding:10px 14px}
-  .nav-logo{font-size:22px}
-  .page{padding:14px}
+  .top-tabs{display:none}
+  .bnav{display:block}
+  .page{padding:12px;padding-bottom:108px}
 }
 
-/* TABS inside admin */
-.admin-tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0}
-.admin-tab{padding:10px 18px;border:none;background:transparent;color:var(--muted);font-family:var(--font-body);font-size:14px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
-.admin-tab:hover{color:var(--text)}
-.admin-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.admin-panel{display:none}
-.admin-panel.active{display:block}
+/* TYPOGRAPHY */
+.pg-title{font-family:var(--fd);font-size:30px;letter-spacing:.04em;margin-bottom:4px}
+.pg-sub{color:var(--muted);font-size:14px;margin-bottom:16px}
 
-/* HOLE COLUMNS scroll */
-.scoreboard-wrap{overflow-x:auto}
+/* CARD / GRID */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.card-ttl{font-family:var(--fd);font-size:20px;color:var(--accent);letter-spacing:.04em}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
 
-/* empty state */
-.empty{text-align:center;padding:48px 24px;color:var(--muted)}
-.empty-icon{font-size:48px;margin-bottom:12px}
-.empty p{font-size:15px}
+/* STATUS PILLS */
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.pill{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:13px;display:flex;align-items:center;gap:5px}
+.pill-val{font-family:var(--fd);font-size:17px;color:var(--accent)}
+
+/* SCOREBOARD TABLE */
+.sb-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);border:1px solid var(--border)}
+.sb-table{border-collapse:collapse;width:100%}
+.sb-table th{background:var(--bg3);padding:8px 8px;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;text-align:center;border:1px solid var(--border)}
+.sb-table th.tleft{text-align:left;padding-left:12px}
+.hole-sub{font-size:10px;color:var(--accent2);font-weight:400;text-transform:none;letter-spacing:0;display:block;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0 auto}
+.sb-table td{border:1px solid var(--border);padding:0;vertical-align:middle}
+.sb-table tr:nth-child(even) td{background:rgba(255,255,255,.018)}
+.team-td{padding:10px 12px!important;min-width:120px}
+.tn{font-weight:600;font-size:14px;white-space:nowrap}
+.tp{font-size:11px;color:var(--muted)}
+.score-cell{text-align:center;min-width:96px;padding:5px 3px!important}
+
+/* +/- WIDGET (scoreboard) */
+.sw{display:flex;align-items:center;justify-content:center;gap:2px}
+.sw-btn{width:36px;height:36px;border:none;border-radius:7px;font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .12s;-webkit-user-select:none;user-select:none;line-height:1}
+.sw-btn.m{background:rgba(240,90,90,.2);color:var(--danger)}
+.sw-btn.p{background:rgba(200,240,70,.2);color:var(--accent)}
+.sw-btn:active{transform:scale(.82)}
+.sw-v{width:34px;text-align:center;font-family:var(--fd);font-size:20px;color:var(--text);line-height:1}
+.sw-v.z{color:var(--muted)}
+.total-td{font-family:var(--fd);font-size:20px;text-align:center;color:var(--accent);padding:8px 10px!important;white-space:nowrap}
+.mgpts-td{font-family:var(--fd);font-size:20px;text-align:center;color:var(--accent3);padding:8px 10px!important}
+.comb-td{font-family:var(--fd);font-size:20px;text-align:center;padding:8px 10px!important}
+
+/* LEADERBOARD */
+.lb-row{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px}
+.lb-row.gold{border-color:var(--accent);background:rgba(200,240,70,.06)}
+.lb-row.silver{border-color:var(--accent2);background:rgba(70,200,240,.04)}
+.lb-row.bronze{border-color:var(--accent3);background:rgba(240,134,74,.04)}
+.lb-rank{font-family:var(--fd);font-size:32px;width:40px;text-align:center;flex-shrink:0}
+.lb-rank.gold{color:var(--accent)} .lb-rank.silver{color:var(--accent2)} .lb-rank.bronze{color:var(--accent3)}
+.lb-info{flex:1;min-width:0}
+.lb-team{font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-players{font-size:12px;color:var(--muted)}
+.lb-stats{display:flex;gap:12px;flex-shrink:0}
+.lb-stat{display:flex;flex-direction:column;align-items:flex-end}
+.lb-sv{font-family:var(--fd);font-size:21px}
+.lb-sl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+
+/* MINIGAMES */
+.mg-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;position:relative;overflow:hidden}
+.mg-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.mg-title{font-family:var(--fd);font-size:20px;margin-bottom:4px}
+.mg-badge{display:inline-block;background:rgba(200,240,70,.15);color:var(--accent);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;margin-bottom:10px}
+.mg-desc{font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.5}
+.mg-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.mg-name{flex:1;font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+/* +/- WIDGET (minigames) */
+.mw{display:flex;align-items:center;gap:2px}
+.mw-btn{width:38px;height:38px;border:none;border-radius:7px;font-size:22px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .12s;-webkit-user-select:none;user-select:none}
+.mw-btn.m{background:rgba(240,90,90,.2);color:var(--danger)}
+.mw-btn.p{background:rgba(200,240,70,.2);color:var(--accent)}
+.mw-btn:active{transform:scale(.82)}
+.mw-v{width:38px;text-align:center;font-family:var(--fd);font-size:22px;color:var(--text)}
+.mw-max{font-size:12px;color:var(--muted);flex-shrink:0}
+
+/* LOGBOOK */
+.log-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);align-items:flex-start;flex-wrap:wrap}
+.log-time{font-size:11px;color:var(--muted);white-space:nowrap;min-width:84px;font-variant-numeric:tabular-nums;padding-top:2px;flex-shrink:0}
+.log-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.ls{background:rgba(200,240,70,.15);color:var(--accent)}
+.la{background:rgba(70,200,240,.15);color:var(--accent2)}
+.lm{background:rgba(240,134,74,.15);color:var(--accent3)}
+.log-msg{font-size:13px;color:var(--text);line-height:1.4;flex:1;min-width:150px}
+
+/* ADMIN */
+.admin-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.atab{padding:10px 16px;border:none;background:transparent;color:var(--muted);font-family:var(--fb);font-size:14px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .18s;white-space:nowrap}
+.atab:hover{color:var(--text)}
+.atab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.apanel{display:none}
+.apanel.active{display:block}
+.form-g{margin-bottom:13px}
+.form-l{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.form-i{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--fb);font-size:16px;padding:12px 13px;-webkit-appearance:none;appearance:none}
+.form-i:focus{outline:none;border-color:var(--accent)}
+.form-i::placeholder{color:var(--muted)}
+textarea.form-i{resize:vertical;min-height:68px}
+.btn{padding:12px 18px;border-radius:8px;border:none;font-family:var(--fb);font-size:15px;font-weight:600;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:6px;min-height:48px;-webkit-user-select:none;user-select:none}
+.btn-p{background:var(--accent);color:#0d0f14}
+.btn-p:active{transform:scale(.96)}
+.btn-d{background:rgba(240,90,90,.15);color:var(--danger);border:1px solid rgba(240,90,90,.3)}
+.btn-d:active{background:rgba(240,90,90,.25)}
+.btn-sm{padding:7px 12px;font-size:13px;min-height:36px}
+.hole-row{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.hole-num{background:var(--bg3);border:1px solid var(--border);border-radius:6px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:18px;color:var(--accent)}
+.divider{border:none;border-top:1px solid var(--border);margin:18px 0}
+
+/* PIN MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.overlay.hidden{display:none}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:30px 22px;max-width:320px;width:calc(100% - 40px);text-align:center}
+.modal-title{font-family:var(--fd);font-size:30px;color:var(--accent);margin-bottom:6px}
+.modal-sub{color:var(--muted);font-size:14px;margin-bottom:22px}
+.pin-dots{display:flex;justify-content:center;gap:14px;margin-bottom:26px}
+.pin-dot{width:15px;height:15px;border-radius:50%;border:2px solid var(--border);transition:all .18s}
+.pin-dot.on{background:var(--accent);border-color:var(--accent)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;max-width:240px;margin:0 auto}
+.pk{padding:17px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:11px;color:var(--text);font-family:var(--fd);font-size:26px;cursor:pointer;transition:transform .12s;-webkit-user-select:none;user-select:none}
+.pk:active{transform:scale(.88);background:var(--bg)}
+.pin-err{color:var(--danger);font-size:13px;margin-top:12px;min-height:18px}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+.empty-ico{font-size:42px;margin-bottom:10px}
 </style>
 </head>
 <body>
 
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="logo">PUB<span>GOLF</span></div>
+  <div class="top-tabs">
+    <button class="nav-tab active" data-page="scoreboard">Scorebord</button>
+    <button class="nav-tab" data-page="leaderboard">Ranglijst</button>
+    <button class="nav-tab" data-page="minigames">Mini Games</button>
+    <button class="nav-tab" data-page="logbook">Logboek</button>
+    <button class="nav-tab" data-page="admin">⚙ Beheer</button>
+  </div>
+  <div class="live-wrap">
+    <div class="live-dot" id="liveDot"></div>
+    <span class="live-lbl" id="liveLbl">Verbinden…</span>
+  </div>
+</div>
+
+<!-- SCOREBOARD -->
+<div class="page active" id="page-scoreboard">
+  <div class="pg-title">SCOREBORD</div>
+  <div class="pg-sub">Tik + of − om slagen bij te houden</div>
+  <div class="pills" id="sbPills"></div>
+  <div class="sb-wrap" id="sbWrap">
+    <div class="empty"><div class="empty-ico">🏌️</div><p>Maak teams en holes aan via Beheer.</p></div>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="page" id="page-leaderboard">
+  <div class="pg-title">RANGLIJST</div>
+  <div class="pg-sub">Gecombineerde score: slagen minus minigame punten</div>
+  <div id="lbList"><div class="empty"><div class="empty-ico">🏆</div><p>Nog geen scores.</p></div></div>
+</div>
+
+<!-- MINIGAMES -->
+<div class="page" id="page-minigames">
+  <div class="pg-title">MINI GAMES</div>
+  <div class="pg-sub">Tik + of − om punten toe te kennen</div>
+  <div class="grid2" id="mgList"><div class="empty"><div class="empty-ico">🎯</div><p>Voeg mini games toe via Beheer.</p></div></div>
+</div>
+
+<!-- LOGBOOK -->
+<div class="page" id="page-logbook">
+  <div class="pg-title">LOGBOEK</div>
+  <div class="pg-sub">Alle wijzigingen met tijdstempel</div>
+  <div id="logList"><div class="empty"><div class="empty-ico">📋</div><p>Nog geen activiteit.</p></div></div>
+</div>
+
+<!-- ADMIN -->
+<div class="page" id="page-admin">
+  <div class="pg-title">BEHEERDER</div>
+  <div class="pg-sub">Teams, holes en mini games configureren</div>
+  <div class="admin-tabs">
+    <button class="atab active" data-panel="teams">Teams</button>
+    <button class="atab" data-panel="holes">Holes</button>
+    <button class="atab" data-panel="mgs">Mini Games</button>
+    <button class="atab" data-panel="settings">Instellingen</button>
+  </div>
+
+  <div class="apanel active" id="panel-teams">
+    <div class="grid2">
+      <div class="card">
+        <div class="card-hdr"><div class="card-ttl">TEAM TOEVOEGEN</div></div>
+        <div id="maxNote" style="display:none;color:var(--muted);font-size:13px;margin-bottom:10px">Maximaal 4 teams bereikt.</div>
+        <div id="addTeamForm">
+          <div class="form-g"><label class="form-l">Team naam</label><input class="form-i" id="newTeamName" placeholder="Bijv. Team Eagles" autocomplete="off"/></div>
+          <div class="form-g"><label class="form-l">Speler 1</label><input class="form-i" id="newP1" placeholder="Naam speler 1" autocomplete="off"/></div>
+          <div class="form-g"><label class="form-l">Speler 2</label><input class="form-i" id="newP2" placeholder="Naam speler 2" autocomplete="off"/></div>
+          <button class="btn btn-p" id="addTeamBtn">+ Team toevoegen</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-ttl">TEAMS</div></div>
+        <div id="teamsOverview"><p style="color:var(--muted);font-size:14px">Nog geen teams.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="apanel" id="panel-holes">
+    <div class="grid2">
+      <div class="card">
+        <div class="card-hdr"><div class="card-ttl">HOLE TOEVOEGEN</div></div>
+        <div class="form-g"><label class="form-l">Drankje</label><input class="form-i" id="newDrink" placeholder="Bijv. Hertog Jan, Shot Tequila…" autocomplete="off"/></div>
+        <div class="form-g"><label class="form-l">Par</label><input class="form-i" id="newPar" type="number" value="4" min="1" max="20" inputmode="numeric"/></div>
+        <div class="form-g"><label class="form-l">Notitie (optioneel)</label><textarea class="form-i" id="newNote" placeholder="Extra info…"></textarea></div>
+        <button class="btn btn-p" id="addHoleBtn">+ Hole toevoegen</button>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-ttl">HOLES</div><span style="color:var(--muted);font-size:13px" id="holeCount">0/18</span></div>
+        <div id="holesAdminList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="apanel" id="panel-mgs">
+    <div class="grid2">
+      <div class="card">
+        <div class="card-hdr"><div class="card-ttl">MINI GAME TOEVOEGEN</div></div>
+        <div class="form-g"><label class="form-l">Naam</label><input class="form-i" id="mgName" placeholder="Bijv. Langste teug" autocomplete="off"/></div>
+        <div class="form-g"><label class="form-l">Beschrijving</label><textarea class="form-i" id="mgDesc" placeholder="Uitleg van de mini game…"></textarea></div>
+        <div class="form-g"><label class="form-l">Max punten</label><input class="form-i" id="mgMax" type="number" value="10" min="1" inputmode="numeric"/></div>
+        <button class="btn btn-p" id="addMgBtn">+ Mini game toevoegen</button>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-ttl">MINI GAMES</div></div>
+        <div id="mgAdminList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="apanel" id="panel-settings">
+    <div class="card" style="max-width:380px">
+      <div class="card-hdr"><div class="card-ttl">INSTELLINGEN</div></div>
+      <div class="form-g"><label class="form-l">Nieuwe pincode</label><input class="form-i" id="newPin" type="tel" inputmode="numeric" placeholder="4 cijfers" maxlength="4" autocomplete="off"/></div>
+      <button class="btn btn-p" id="savePinBtn" style="margin-bottom:16px">Pincode opslaan</button>
+      <hr class="divider"/>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:12px">Verwijdert alle teams, holes, scores en logs.</p>
+      <button class="btn btn-d" id="resetBtn">🗑 Alles resetten</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bnav">
+  <div class="bnav-inner">
+    <button class="bn active" data-page="scoreboard"><div class="bn-ico">⛳</div>Score</button>
+    <button class="bn" data-page="leaderboard"><div class="bn-ico">🏆</div>Rang</button>
+    <button class="bn" data-page="minigames"><div class="bn-ico">🎯</div>Games</button>
+    <button class="bn" data-page="logbook"><div class="bn-ico">📋</div>Log</button>
+    <button class="bn" data-page="admin"><div class="bn-ico">⚙️</div>Beheer</button>
+  </div>
+</div>
+
 <!-- PIN MODAL -->
-<div class="modal-overlay hidden" id="pinModal">
+<div class="overlay hidden" id="pinOverlay">
   <div class="modal">
-    <h2>BEHEERDER</h2>
-    <p>Voer de pincode in om het beheerderspaneel te openen</p>
-    <div class="pin-dots" id="pinDots">
-      <div class="pin-dot" id="d0"></div>
-      <div class="pin-dot" id="d1"></div>
-      <div class="pin-dot" id="d2"></div>
-      <div class="pin-dot" id="d3"></div>
+    <div class="modal-title">BEHEERDER</div>
+    <div class="modal-sub">Voer de pincode in</div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
     </div>
     <div class="pin-pad">
-      <button class="pin-btn" onclick="pinPress('1')">1</button>
-      <button class="pin-btn" onclick="pinPress('2')">2</button>
-      <button class="pin-btn" onclick="pinPress('3')">3</button>
-      <button class="pin-btn" onclick="pinPress('4')">4</button>
-      <button class="pin-btn" onclick="pinPress('5')">5</button>
-      <button class="pin-btn" onclick="pinPress('6')">6</button>
-      <button class="pin-btn" onclick="pinPress('7')">7</button>
-      <button class="pin-btn" onclick="pinPress('8')">8</button>
-      <button class="pin-btn" onclick="pinPress('9')">9</button>
-      <button class="pin-btn" onclick="pinPress('clr')" style="color:var(--muted)">C</button>
-      <button class="pin-btn" onclick="pinPress('0')">0</button>
-      <button class="pin-btn" onclick="closePinModal()" style="color:var(--muted)">✕</button>
+      <button class="pk" data-k="1">1</button><button class="pk" data-k="2">2</button><button class="pk" data-k="3">3</button>
+      <button class="pk" data-k="4">4</button><button class="pk" data-k="5">5</button><button class="pk" data-k="6">6</button>
+      <button class="pk" data-k="7">7</button><button class="pk" data-k="8">8</button><button class="pk" data-k="9">9</button>
+      <button class="pk" data-k="clr" style="font-size:15px;color:var(--muted)">C</button>
+      <button class="pk" data-k="0">0</button>
+      <button class="pk" data-k="close" style="font-size:15px;color:var(--muted)">✕</button>
     </div>
-    <div class="pin-error" id="pinError"></div>
+    <div class="pin-err" id="pinErr"></div>
   </div>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- NAV -->
-<nav>
-  <div class="nav-logo">PUB<span>GOLF</span></div>
-  <div class="nav-tabs">
-    <button class="nav-tab active" onclick="showPage('scoreboard')">Scorebord</button>
-    <button class="nav-tab" onclick="showPage('leaderboard')">Ranglijst</button>
-    <button class="nav-tab" onclick="showPage('minigames')">Mini Games</button>
-    <button class="nav-tab" onclick="showPage('logbook')">Logboek</button>
-    <button class="nav-tab" onclick="requestAdmin()">⚙ Beheer</button>
-  </div>
-  <div class="nav-right">
-    <div class="live-dot"></div>
-    <span class="live-txt" id="liveStatus">Verbinden...</span>
-  </div>
-</nav>
-
-<!-- SCOREBOARD PAGE -->
-<div class="page active" id="page-scoreboard">
-  <div class="section-title">SCOREBORD</div>
-  <div class="section-sub" id="scoreboardSub">Live scores per hole</div>
-
-  <div class="status-bar" id="statusBar"></div>
-
-  <div class="scoreboard-wrap" id="scoreboardWrap">
-    <div class="empty"><div class="empty-icon">🏌️</div><p>Nog geen holes aangemaakt. Open Beheer om te beginnen.</p></div>
-  </div>
-</div>
-
-<!-- LEADERBOARD PAGE -->
-<div class="page" id="page-leaderboard">
-  <div class="section-title">RANGLIJST</div>
-  <div class="section-sub">Gecombineerde score: slagen + minigame punten</div>
-  <div id="leaderboardList"><div class="empty"><div class="empty-icon">🏆</div><p>Nog geen scores ingevoerd.</p></div></div>
-</div>
-
-<!-- MINIGAMES PAGE -->
-<div class="page" id="page-minigames">
-  <div class="section-title">MINI GAMES</div>
-  <div class="section-sub">Scoor extra punten met de mini games</div>
-  <div class="grid2" id="minigamesList"><div class="empty"><div class="empty-icon">🎯</div><p>Nog geen mini games aangemaakt.</p></div></div>
-</div>
-
-<!-- LOGBOOK PAGE -->
-<div class="page" id="page-logbook">
-  <div class="section-title">LOGBOEK</div>
-  <div class="section-sub">Alle wijzigingen met tijdstempel</div>
-  <div id="logbookList"><div class="empty"><div class="empty-icon">📋</div><p>Nog geen activiteit.</p></div></div>
-</div>
-
-<!-- ADMIN PAGE -->
-<div class="page" id="page-admin">
-  <div class="section-title">BEHEERDER</div>
-  <div class="section-sub">Configureer teams, holes en mini games</div>
-
-  <div class="admin-tabs">
-    <button class="admin-tab active" onclick="switchAdminTab('teams',this)">Teams</button>
-    <button class="admin-tab" onclick="switchAdminTab('holes',this)">Holes</button>
-    <button class="admin-tab" onclick="switchAdminTab('minigamesAdmin',this)">Mini Games</button>
-    <button class="admin-tab" onclick="switchAdminTab('settings',this)">Instellingen</button>
-  </div>
-
-  <!-- TEAMS PANEL -->
-  <div class="admin-panel active" id="panel-teams">
-    <div class="grid2">
-      <div class="card">
-        <div class="card-header"><div class="card-title">TEAMS AANMAKEN</div></div>
-        <div id="teamsList"></div>
-        <div style="margin-top:16px" id="addTeamForm">
-          <div class="form-group">
-            <label class="form-label">Team naam</label>
-            <input class="form-input" id="newTeamName" placeholder="Bijv. Team Eagles"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Speler 1</label>
-            <input class="form-input" id="newPlayer1" placeholder="Naam speler 1"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Speler 2</label>
-            <input class="form-input" id="newPlayer2" placeholder="Naam speler 2"/>
-          </div>
-          <button class="btn btn-primary" onclick="addTeam()">+ Team toevoegen</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">OVERZICHT TEAMS</div></div>
-        <div id="teamsOverview"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- HOLES PANEL -->
-  <div class="admin-panel" id="panel-holes">
-    <div class="grid2">
-      <div class="card">
-        <div class="card-header"><div class="card-title">HOLE TOEVOEGEN</div></div>
-        <div class="form-group">
-          <label class="form-label">Drankje</label>
-          <input class="form-input" id="newHoleDrink" placeholder="Bijv. Hertog Jan, Shot Tequila..."/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Par (standaard slagen)</label>
-          <input class="form-input" id="newHolePar" type="number" value="4" min="1" max="20"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Notitie (optioneel)</label>
-          <textarea class="form-input" id="newHoleNote" placeholder="Extra info over deze hole..."></textarea>
-        </div>
-        <button class="btn btn-primary" onclick="addHole()">+ Hole toevoegen</button>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">18 HOLES</div>
-          <span style="color:var(--muted);font-size:13px" id="holeCount">0 / 18</span>
-        </div>
-        <div id="holesAdminList"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MINIGAMES ADMIN PANEL -->
-  <div class="admin-panel" id="panel-minigamesAdmin">
-    <div class="grid2">
-      <div class="card">
-        <div class="card-header"><div class="card-title">MINI GAME TOEVOEGEN</div></div>
-        <div class="form-group">
-          <label class="form-label">Naam</label>
-          <input class="form-input" id="mgName" placeholder="Bijv. Wie het langst rechtop staat"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Beschrijving</label>
-          <textarea class="form-input" id="mgDesc" placeholder="Uitleg van de mini game..."></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Max punten te behalen</label>
-          <input class="form-input" id="mgMaxPts" type="number" value="10" min="1"/>
-        </div>
-        <button class="btn btn-primary" onclick="addMinigame()">+ Mini game toevoegen</button>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">MINI GAMES</div></div>
-        <div id="mgAdminList"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SETTINGS PANEL -->
-  <div class="admin-panel" id="panel-settings">
-    <div class="card" style="max-width:400px">
-      <div class="card-header"><div class="card-title">INSTELLINGEN</div></div>
-      <div class="form-group">
-        <label class="form-label">Pincode wijzigen</label>
-        <input class="form-input" id="newPin" type="password" placeholder="Nieuwe 4-cijferige pincode" maxlength="4"/>
-      </div>
-      <button class="btn btn-primary" onclick="savePin()" style="margin-bottom:12px">Pincode opslaan</button>
-      <hr class="divider"/>
-      <div class="form-group">
-        <label class="form-label">Gevaarlijk gebied</label>
-      </div>
-      <button class="btn btn-danger" onclick="resetAll()">🗑 Alles resetten</button>
-    </div>
-  </div>
-</div>
-
-<!-- FIREBASE via script tags (geen npm/module nodig) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
-// =====================================================
-// FIREBASE CONFIG
-// Vul hieronder jouw gegevens in uit Firebase Console
-// Project settings → Your apps → Web app → Config
-// De databaseURL is al ingevuld!
-// =====================================================
-const firebaseConfig = {
+// ── FIREBASE ──────────────────────────────
+firebase.initializeApp({
   apiKey: "AIzaSyD-m6f8Sayp09ulCM1uUHIxx8I1BWh4Q18",
   authDomain: "pubgolf-f4eaa.firebaseapp.com",
   databaseURL: "https://pubgolf-f4eaa-default-rtdb.europe-west1.firebasedatabase.app",
@@ -394,514 +352,348 @@ const firebaseConfig = {
   storageBucket: "pubgolf-f4eaa.firebasestorage.app",
   messagingSenderId: "38149622978",
   appId: "1:38149622978:web:9d586a383ea685a2563f5b"
-};
-
-// Controleer of config compleet is
-if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "JOUW_API_KEY") {
-  document.body.innerHTML = `
-    <div style="font-family:sans-serif;max-width:500px;margin:80px auto;padding:32px;background:#1a1e28;border:1px solid #f0864a;border-radius:12px;color:#eef0f5">
-      <h2 style="font-size:24px;color:#f0864a;margin-bottom:12px">⚠️ Firebase config ontbreekt</h2>
-      <p style="color:#9ca3af;margin-bottom:16px">Vul de Firebase config in in het HTML-bestand:</p>
-      <ol style="color:#eef0f5;line-height:2;padding-left:20px">
-        <li>Ga naar <a href="https://console.firebase.google.com" target="_blank" style="color:#c8f046">console.firebase.google.com</a></li>
-        <li>Klik op project <strong>pubgolf-f4eaa</strong></li>
-        <li>Tandwiel ⚙️ → <strong>Project settings</strong></li>
-        <li>Scroll naar <strong>Your apps</strong> → klik op <strong>&lt;/&gt;</strong> web app</li>
-        <li>Kopieer <code style="background:#0d0f14;padding:2px 6px;border-radius:4px">apiKey</code>, <code style="background:#0d0f14;padding:2px 6px;border-radius:4px">messagingSenderId</code> en <code style="background:#0d0f14;padding:2px 6px;border-radius:4px">appId</code></li>
-        <li>Plak ze in <strong>pubgolf.html</strong> op de juiste plek</li>
-      </ol>
-    </div>`;
-  throw new Error('Firebase config niet ingevuld');
-}
-
-firebase.initializeApp(firebaseConfig);
+});
 const db = firebase.database();
 
-// Compat API helpers (zelfde namen als voor)
-const ref      = (path) => db.ref(path);
-const set      = (r, v) => r.set(v);
-const get      = (r)    => r.get();
-const update   = (r, v) => r.update(v);
-const remove   = (r)    => r.remove();
-const push     = (r)    => r.push();
-const onValue  = (r, cb, err) => r.on('value', snap => cb(snap), err);
-const pushVal  = (r, v) => r.push(v);
-
-// =====================================================
-// STATE
-// =====================================================
-let state = { teams:{}, holes:{}, minigames:{}, scores:{}, mgScores:{}, logs:[] };
+// ── STATE ─────────────────────────────────
+let S = { teams:{}, holes:{}, minigames:{}, scores:{}, mgScores:{}, logs:{} };
 let adminUnlocked = false;
-let pinBuffer = '';
-const DEFAULT_PIN = '1234';
+let pinBuf = '';
 
-// =====================================================
-// FIREBASE LISTENERS
-// =====================================================
-function initListeners() {
-  onValue(ref('/'), snap => {
-    const data = snap.val() || {};
-    state.teams     = data.teams     || {};
-    state.holes     = data.holes     || {};
-    state.minigames = data.minigames || {};
-    state.scores    = data.scores    || {};
-    state.mgScores  = data.mgScores  || {};
-    state.logs      = data.logs      || [];
-    renderAll();
-    document.getElementById('liveStatus').textContent = 'Live';
-  }, err => {
-    document.getElementById('liveStatus').textContent = 'Fout';
-    console.error(err);
-  });
+// ── LIVE LISTENER ─────────────────────────
+db.ref('/').on('value', snap => {
+  const d = snap.val() || {};
+  S.teams     = d.teams     || {};
+  S.holes     = d.holes     || {};
+  S.minigames = d.minigames || {};
+  S.scores    = d.scores    || {};
+  S.mgScores  = d.mgScores  || {};
+  S.logs      = d.logs      || {};
+  renderAll();
+  document.getElementById('liveDot').className = 'live-dot on';
+  const l = document.getElementById('liveLbl'); l.textContent='Live'; l.className='live-lbl on';
+}, () => {
+  document.getElementById('liveDot').className = 'live-dot';
+  document.getElementById('liveLbl').textContent = 'Offline';
+});
+
+// ── HELPERS ───────────────────────────────
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const T   = () => Object.values(S.teams);
+const H   = () => Object.values(S.holes).sort((a,b)=>a.num-b.num);
+const MG  = () => Object.values(S.minigames);
+const slg = tid => H().reduce((s,h) => s + (parseInt((S.scores[tid]||{})[h.id])||0), 0);
+const mgp = tid => Object.values(S.mgScores[tid]||{}).reduce((s,v) => s+(parseInt(v)||0), 0);
+
+function toast(msg, type='ok'){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast show '+type;
+  clearTimeout(el._t); el._t = setTimeout(()=>el.className='toast', 2600);
 }
 
-// =====================================================
-// RENDER ALL
-// =====================================================
-function renderAll() {
-  renderScoreboard();
-  renderLeaderboard();
-  renderMinigames();
-  renderLogbook();
-  if (adminUnlocked) {
-    renderTeamsAdmin();
-    renderHolesAdmin();
-    renderMgAdmin();
-  }
-}
-
-// =====================================================
-// SCOREBOARD
-// =====================================================
-function renderScoreboard() {
-  const wrap = document.getElementById('scoreboardWrap');
-  const teams = Object.values(state.teams);
-  const holes  = Object.values(state.holes).sort((a,b)=>a.num-b.num);
-
-  if (!teams.length || !holes.length) {
-    wrap.innerHTML = '<div class="empty"><div class="empty-icon">🏌️</div><p>Maak teams en holes aan in het beheerderspaneel.</p></div>';
-    return;
-  }
-
-  const cols = holes.length;
-  let html = `<div class="scoreboard-wrap" style="overflow-x:auto">
-  <div style="min-width:${200 + cols*88 + 270}px">
-  <div class="scoreboard-header" style="--cols:${cols}">
-    <div>Team</div>`;
-  holes.forEach(h => html += `<div style="text-align:center"><div style="font-size:13px;color:var(--muted)">H${h.num}</div><div style="font-size:11px;color:var(--accent2);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${h.drink}">${h.drink||''}</div></div>`);
-  html += `<div style="text-align:center">Slagen</div><div style="text-align:center">MG Pts</div><div style="text-align:center">Totaal</div></div>`;
-
-  teams.forEach(team => {
-    const tid = team.id;
-    const teamScores = state.scores[tid] || {};
-    const mgPts = calcMgPoints(tid);
-    let slagenTotal = 0;
-    html += `<div class="scoreboard-row" style="--cols:${cols}">
-      <div class="team-cell"><div class="team-name">${esc(team.name)}</div><div class="team-players">${esc(team.p1)} &amp; ${esc(team.p2)}</div></div>`;
-    holes.forEach(h => {
-      const hid = h.id;
-      const val = teamScores[hid] ?? '';
-      slagenTotal += parseInt(val)||0;
-      html += `<div style="text-align:center"><input class="score-input" type="number" min="0" max="99" value="${val}" placeholder="–"
-        onchange="saveScore('${tid}','${hid}',this.value,'${esc(team.name)}','${h.num}')"
-        title="H${h.num} – ${esc(h.drink)}" /></div>`;
-    });
-    const combined = slagenTotal - mgPts;
-    html += `<div class="total-cell" style="text-align:center;color:var(--accent)">${slagenTotal||'–'}</div>
-      <div class="total-cell" style="text-align:center;color:var(--accent3)">+${mgPts}</div>
-      <div class="total-cell" style="text-align:center">${slagenTotal ? combined : '–'}</div>
-    </div>`;
-  });
-
-  html += `</div></div>`;
-  wrap.innerHTML = html;
-
-  // Status bar
-  const sb = document.getElementById('statusBar');
-  const holesPlayed = holes.filter(h => teams.some(t => state.scores[t.id]?.[h.id])).length;
-  sb.innerHTML = `
-    <div class="stat-pill"><span class="stat-pill-val">${teams.length}</span> teams</div>
-    <div class="stat-pill"><span class="stat-pill-val">${holes.length}</span> holes</div>
-    <div class="stat-pill"><span class="stat-pill-val">${holesPlayed}</span> gespeeld</div>
-    <div class="stat-pill"><span class="stat-pill-val">${holes.length - holesPlayed}</span> resterend</div>`;
-}
-
-window.saveScore = async function(tid, hid, val, teamName, holeNum) {
-  const v = val === '' ? null : parseInt(val);
-  await set(ref(`/scores/${tid}/${hid}`), v);
-  addLog(`${teamName} – Hole ${holeNum}: ${v ?? 'gewist'} slagen`, 'score');
-};
-
-// =====================================================
-// LEADERBOARD
-// =====================================================
-function renderLeaderboard() {
-  const teams = Object.values(state.teams);
-  const holes  = Object.values(state.holes);
-  if (!teams.length) {
-    document.getElementById('leaderboardList').innerHTML = '<div class="empty"><div class="empty-icon">🏆</div><p>Nog geen teams aangemaakt.</p></div>';
-    return;
-  }
-  const ranked = teams.map(team => {
-    const tid = team.id;
-    const ts = state.scores[tid] || {};
-    const slagen = holes.reduce((s,h) => s + (parseInt(ts[h.id])||0), 0);
-    const mgPts  = calcMgPoints(tid);
-    return { team, slagen, mgPts, combined: slagen - mgPts };
-  }).sort((a,b) => {
-    if (!a.slagen && !b.slagen) return 0;
-    if (!a.slagen) return 1;
-    if (!b.slagen) return -1;
-    return a.combined - b.combined;
-  });
-
-  const rankColors = ['rank-1','rank-2','rank-3'];
-  let html = '';
-  ranked.forEach((r, i) => {
-    const cls = rankColors[i] || '';
-    html += `<div class="lb-row">
-      <div class="lb-rank ${cls}">${i+1}</div>
-      <div class="lb-info">
-        <div class="lb-team">${esc(r.team.name)}</div>
-        <div class="lb-players">${esc(r.team.p1)} &amp; ${esc(r.team.p2)}</div>
-      </div>
-      <div class="lb-scores">
-        <div class="lb-stat"><div class="lb-stat-val" style="color:var(--accent)">${r.slagen||'–'}</div><div class="lb-stat-lbl">Slagen</div></div>
-        <div class="lb-stat"><div class="lb-stat-val" style="color:var(--accent3)">+${r.mgPts}</div><div class="lb-stat-lbl">MG Pts</div></div>
-        <div class="lb-stat"><div class="lb-stat-val">${r.slagen ? r.combined : '–'}</div><div class="lb-stat-lbl">Gecomb.</div></div>
-      </div>
-    </div>`;
-  });
-  document.getElementById('leaderboardList').innerHTML = html;
-}
-
-function calcMgPoints(tid) {
-  const mgs = state.mgScores[tid] || {};
-  return Object.values(mgs).reduce((s,v) => s + (parseInt(v)||0), 0);
-}
-
-// =====================================================
-// MINIGAMES
-// =====================================================
-function renderMinigames() {
-  const mgs = Object.values(state.minigames);
-  const teams = Object.values(state.teams);
-  if (!mgs.length) {
-    document.getElementById('minigamesList').innerHTML = '<div class="empty"><div class="empty-icon">🎯</div><p>Nog geen mini games aangemaakt.</p></div>';
-    return;
-  }
-  let html = '';
-  mgs.forEach(mg => {
-    html += `<div class="minigame-card">
-      <div class="mg-title">${esc(mg.name)}</div>
-      <div class="mg-pts">Max ${mg.maxPts} punten</div>
-      ${mg.desc ? `<p style="font-size:13px;color:var(--muted);margin-bottom:12px">${esc(mg.desc)}</p>` : ''}`;
-    teams.forEach(team => {
-      const val = state.mgScores[team.id]?.[mg.id] ?? '';
-      html += `<div class="mg-team-row">
-        <div class="mg-team-name">${esc(team.name)}</div>
-        <input class="mg-score-input" type="number" min="0" max="${mg.maxPts}" value="${val}" placeholder="0"
-          onchange="saveMgScore('${team.id}','${mg.id}',this.value,'${esc(team.name)}','${esc(mg.name)}',${mg.maxPts})" />
-        <span style="font-size:12px;color:var(--muted)">/ ${mg.maxPts}</span>
-      </div>`;
-    });
-    html += `</div>`;
-  });
-  document.getElementById('minigamesList').innerHTML = html;
-}
-
-window.saveMgScore = async function(tid, mgid, val, teamName, mgName, max) {
-  let v = parseInt(val);
-  if (isNaN(v)) v = 0;
-  v = Math.min(v, max);
-  await set(ref(`/mgScores/${tid}/${mgid}`), v);
-  addLog(`${teamName} – ${mgName}: ${v} punten`, 'mini');
-};
-
-// =====================================================
-// LOGBOOK
-// =====================================================
-function renderLogbook() {
-  const logs = Array.isArray(state.logs) ? [...state.logs].reverse() : Object.values(state.logs).reverse();
-  if (!logs.length) {
-    document.getElementById('logbookList').innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>Nog geen activiteit.</p></div>';
-    return;
-  }
-  let html = '';
-  logs.slice(0,100).forEach(log => {
-    const typeClass = log.type === 'score' ? 'log-score' : log.type === 'mini' ? 'log-mini' : 'log-admin';
-    const typeLabel = log.type === 'score' ? 'Score' : log.type === 'mini' ? 'Mini game' : 'Beheer';
-    html += `<div class="log-entry">
-      <span class="log-time">${log.time||''}</span>
-      <span class="log-type ${typeClass}">${typeLabel}</span>
-      <span class="log-msg">${esc(log.msg)}</span>
-    </div>`;
-  });
-  document.getElementById('logbookList').innerHTML = html;
-}
-
-async function addLog(msg, type='admin') {
+async function addLog(msg, type='admin'){
   const now = new Date();
-  const time = now.toLocaleTimeString('nl-NL', {hour:'2-digit',minute:'2-digit',second:'2-digit'})
+  const time = now.toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit',second:'2-digit'})
     + ' ' + now.toLocaleDateString('nl-NL',{day:'2-digit',month:'2-digit'});
-  const entry = { msg, type, time, ts: Date.now() };
-  await pushVal(ref('/logs'), entry);
+  db.ref('/logs').push({ msg, type, time, ts: Date.now() });
 }
 
-// =====================================================
-// ADMIN: TEAMS
-// =====================================================
-function renderTeamsAdmin() {
-  const teams = Object.values(state.teams);
-  const overview = document.getElementById('teamsOverview');
-  const list = document.getElementById('teamsList');
+async function getPin(){ const s = await db.ref('/config/pin').get(); return s.val()||'1234'; }
 
-  if (!teams.length) {
-    overview.innerHTML = '<p style="color:var(--muted);font-size:14px">Nog geen teams.</p>';
-    list.innerHTML = '';
-    return;
+// ── RENDER ALL ────────────────────────────
+function renderAll(){
+  renderSB(); renderLB(); renderMG(); renderLog();
+  if (adminUnlocked) renderAdmin();
+}
+
+// ── SCOREBOARD ────────────────────────────
+function renderSB(){
+  const teams=T(), holes=H();
+  const played = holes.filter(h=>teams.some(t=>(S.scores[t.id]||{})[h.id])).length;
+  document.getElementById('sbPills').innerHTML = teams.length
+    ? `<div class="pill"><span class="pill-val">${teams.length}</span> teams</div>
+       <div class="pill"><span class="pill-val">${holes.length}</span> holes</div>
+       <div class="pill"><span class="pill-val">${played}</span> gespeeld</div>
+       <div class="pill"><span class="pill-val">${holes.length-played}</span> resterend</div>` : '';
+
+  if (!teams.length || !holes.length){
+    document.getElementById('sbWrap').innerHTML='<div class="empty"><div class="empty-ico">🏌️</div><p>Maak teams en holes aan via Beheer.</p></div>'; return;
   }
 
-  let html = '';
+  let html = '<table class="sb-table"><thead><tr><th class="tleft">Team</th>';
+  holes.forEach(h => html += `<th>H${h.num}<span class="hole-sub" title="${esc(h.drink)}">${esc(h.drink)}</span></th>`);
+  html += '<th>Slagen</th><th>MG +</th><th>Totaal</th></tr></thead><tbody>';
+
   teams.forEach(t => {
-    html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
-      <div>
-        <div style="font-weight:600;font-size:14px">${esc(t.name)}</div>
-        <div style="font-size:12px;color:var(--muted)">${esc(t.p1)} &amp; ${esc(t.p2)}</div>
-      </div>
-      <button class="btn btn-danger btn-sm" onclick="deleteTeam('${t.id}','${esc(t.name)}')">Verwijderen</button>
-    </div>`;
+    const sl=slg(t.id), mp=mgp(t.id);
+    html += `<tr><td class="team-td"><div class="tn">${esc(t.name)}</div><div class="tp">${esc(t.p1)} & ${esc(t.p2)}</div></td>`;
+    holes.forEach(h => {
+      const v = parseInt((S.scores[t.id]||{})[h.id])||0;
+      html += `<td class="score-cell"><div class="sw">
+        <button class="sw-btn m" data-tid="${t.id}" data-hid="${h.id}" data-d="-1">−</button>
+        <div class="sw-v${v===0?' z':''}" id="sv_${t.id}_${h.id}">${v===0?'–':v}</div>
+        <button class="sw-btn p" data-tid="${t.id}" data-hid="${h.id}" data-d="1">+</button>
+      </div></td>`;
+    });
+    html += `<td class="total-td">${sl||'–'}</td><td class="mgpts-td">${mp?'+'+mp:'–'}</td><td class="comb-td">${sl?(sl-mp):'–'}</td></tr>`;
   });
-  overview.innerHTML = html;
-  list.innerHTML = teams.length >= 4
-    ? `<div style="padding:10px 0;color:var(--muted);font-size:13px;border-bottom:1px solid var(--border);margin-bottom:12px">Maximaal 4 teams bereikt</div>`
-    : '';
-  if (teams.length >= 4) document.getElementById('addTeamForm').style.display = 'none';
-  else document.getElementById('addTeamForm').style.display = '';
+  html += '</tbody></table>';
+  document.getElementById('sbWrap').innerHTML = html;
 }
 
-window.addTeam = async function() {
-  const name = document.getElementById('newTeamName').value.trim();
-  const p1   = document.getElementById('newPlayer1').value.trim();
-  const p2   = document.getElementById('newPlayer2').value.trim();
-  if (!name||!p1||!p2) { showToast('Vul alle velden in','error'); return; }
-  if (Object.keys(state.teams).length >= 4) { showToast('Max 4 teams','error'); return; }
-  const id = 'team_' + Date.now();
-  await set(ref(`/teams/${id}`), { id, name, p1, p2 });
+document.getElementById('sbWrap').addEventListener('click', async e => {
+  const btn = e.target.closest('.sw-btn'); if (!btn) return;
+  const {tid, hid, d} = btn.dataset;
+  const cur = parseInt((S.scores[tid]||{})[hid])||0;
+  const next = Math.max(0, cur + parseInt(d));
+  await db.ref(`/scores/${tid}/${hid}`).set(next||null);
+  addLog(`${S.teams[tid]?.name||tid} – Hole ${S.holes[hid]?.num||hid}: ${next} slagen`, 'score');
+});
+
+// ── LEADERBOARD ───────────────────────────
+function renderLB(){
+  const teams=T();
+  if (!teams.length){ document.getElementById('lbList').innerHTML='<div class="empty"><div class="empty-ico">🏆</div><p>Nog geen teams.</p></div>'; return; }
+  const ranked = teams.map(t=>({t, sl:slg(t.id), mp:mgp(t.id)}))
+    .map(r=>({...r, comb:r.sl-r.mp}))
+    .sort((a,b)=>{ if(!a.sl&&!b.sl)return 0; if(!a.sl)return 1; if(!b.sl)return -1; return a.comb-b.comb; });
+  const medals=['gold','silver','bronze'];
+  document.getElementById('lbList').innerHTML = ranked.map((r,i)=>`
+    <div class="lb-row ${medals[i]||''}">
+      <div class="lb-rank ${medals[i]||''}">${i+1}</div>
+      <div class="lb-info"><div class="lb-team">${esc(r.t.name)}</div><div class="lb-players">${esc(r.t.p1)} & ${esc(r.t.p2)}</div></div>
+      <div class="lb-stats">
+        <div class="lb-stat"><div class="lb-sv" style="color:var(--accent)">${r.sl||'–'}</div><div class="lb-sl">Slagen</div></div>
+        <div class="lb-stat"><div class="lb-sv" style="color:var(--accent3)">${r.mp?'+'+r.mp:'0'}</div><div class="lb-sl">MG</div></div>
+        <div class="lb-stat"><div class="lb-sv">${r.sl?r.comb:'–'}</div><div class="lb-sl">Totaal</div></div>
+      </div>
+    </div>`).join('');
+}
+
+// ── MINIGAMES ─────────────────────────────
+function renderMG(){
+  const mgs=MG(), teams=T();
+  if (!mgs.length){ document.getElementById('mgList').innerHTML='<div class="empty"><div class="empty-ico">🎯</div><p>Voeg mini games toe via Beheer.</p></div>'; return; }
+  document.getElementById('mgList').innerHTML = mgs.map(mg=>`
+    <div class="mg-card">
+      <div class="mg-title">${esc(mg.name)}</div>
+      <div class="mg-badge">Max ${mg.maxPts} punten</div>
+      ${mg.desc?`<div class="mg-desc">${esc(mg.desc)}</div>`:''}
+      ${teams.map(t=>{
+        const v=parseInt((S.mgScores[t.id]||{})[mg.id])||0;
+        return `<div class="mg-row">
+          <div class="mg-name">${esc(t.name)}</div>
+          <div class="mw">
+            <button class="mw-btn m" data-tid="${t.id}" data-mgid="${mg.id}" data-max="${mg.maxPts}" data-d="-1">−</button>
+            <div class="mw-v" id="mgv_${t.id}_${mg.id}">${v}</div>
+            <button class="mw-btn p" data-tid="${t.id}" data-mgid="${mg.id}" data-max="${mg.maxPts}" data-d="1">+</button>
+          </div>
+          <div class="mw-max">/ ${mg.maxPts}</div>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+}
+
+document.getElementById('mgList').addEventListener('click', async e => {
+  const btn = e.target.closest('.mw-btn'); if (!btn) return;
+  const {tid, mgid, max, d} = btn.dataset;
+  const cur = parseInt((S.mgScores[tid]||{})[mgid])||0;
+  const next = Math.min(parseInt(max), Math.max(0, cur+parseInt(d)));
+  await db.ref(`/mgScores/${tid}/${mgid}`).set(next);
+  addLog(`${S.teams[tid]?.name||tid} – ${S.minigames[mgid]?.name||mgid}: ${next} punten`, 'mini');
+});
+
+// ── LOGBOOK ───────────────────────────────
+function renderLog(){
+  const entries = Object.values(S.logs).sort((a,b)=>b.ts-a.ts);
+  if (!entries.length){ document.getElementById('logList').innerHTML='<div class="empty"><div class="empty-ico">📋</div><p>Nog geen activiteit.</p></div>'; return; }
+  document.getElementById('logList').innerHTML = entries.slice(0,120).map(e=>{
+    const cls=e.type==='score'?'ls':e.type==='mini'?'lm':'la';
+    const lbl=e.type==='score'?'Score':e.type==='mini'?'Mini game':'Beheer';
+    return `<div class="log-item"><span class="log-time">${esc(e.time)}</span><span class="log-badge ${cls}">${lbl}</span><span class="log-msg">${esc(e.msg)}</span></div>`;
+  }).join('');
+}
+
+// ── ADMIN RENDER ──────────────────────────
+function renderAdmin(){ renderTeams(); renderHoles(); renderMgsAdmin(); }
+
+function renderTeams(){
+  const teams=T(); const full=teams.length>=4;
+  document.getElementById('maxNote').style.display = full?'':'none';
+  document.getElementById('addTeamForm').style.display = full?'none':'';
+  document.getElementById('teamsOverview').innerHTML = teams.length
+    ? teams.map(t=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div><div style="font-weight:600;font-size:14px">${esc(t.name)}</div><div style="font-size:12px;color:var(--muted)">${esc(t.p1)} & ${esc(t.p2)}</div></div>
+        <button class="btn btn-d btn-sm del-team" data-id="${t.id}" data-name="${esc(t.name)}">Verwijderen</button>
+      </div>`).join('')
+    : '<p style="color:var(--muted);font-size:14px">Nog geen teams.</p>';
+}
+
+function renderHoles(){
+  const holes=H();
+  document.getElementById('holeCount').textContent=holes.length+'/18';
+  document.getElementById('holesAdminList').innerHTML = holes.length
+    ? holes.map(h=>`<div class="hole-row">
+        <div class="hole-num">${h.num}</div>
+        <div><div style="font-weight:600;font-size:13px">${esc(h.drink)}</div><div style="font-size:11px;color:var(--muted)">Par ${h.par}${h.note?' · '+esc(h.note):''}</div></div>
+        <button class="btn btn-d btn-sm del-hole" data-id="${h.id}" data-num="${h.num}">✕</button>
+      </div>`).join('')
+    : '<p style="color:var(--muted);font-size:14px;padding:10px 0">Nog geen holes.</p>';
+}
+
+function renderMgsAdmin(){
+  const mgs=MG();
+  document.getElementById('mgAdminList').innerHTML = mgs.length
+    ? mgs.map(mg=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div><div style="font-weight:600;font-size:14px">${esc(mg.name)}</div><div style="font-size:12px;color:var(--muted)">Max ${mg.maxPts} pt</div></div>
+        <button class="btn btn-d btn-sm del-mg" data-id="${mg.id}" data-name="${esc(mg.name)}">✕</button>
+      </div>`).join('')
+    : '<p style="color:var(--muted);font-size:14px;padding:10px 0">Nog geen mini games.</p>';
+}
+
+// ── ADMIN EVENTS ──────────────────────────
+document.getElementById('addTeamBtn').addEventListener('click', async () => {
+  const name=document.getElementById('newTeamName').value.trim();
+  const p1=document.getElementById('newP1').value.trim();
+  const p2=document.getElementById('newP2').value.trim();
+  if (!name||!p1||!p2){ toast('Vul alle velden in','err'); return; }
+  if (T().length>=4){ toast('Max 4 teams','err'); return; }
+  const id='team_'+Date.now();
+  await db.ref('/teams/'+id).set({id,name,p1,p2});
   addLog(`Team aangemaakt: ${name} (${p1} & ${p2})`);
-  document.getElementById('newTeamName').value = '';
-  document.getElementById('newPlayer1').value = '';
-  document.getElementById('newPlayer2').value = '';
-  showToast(`Team ${name} aangemaakt`);
-};
+  ['newTeamName','newP1','newP2'].forEach(i=>document.getElementById(i).value='');
+  toast('Team '+name+' aangemaakt');
+});
 
-window.deleteTeam = async function(id, name) {
-  if (!confirm(`Team ${name} verwijderen?`)) return;
-  await remove(ref(`/teams/${id}`));
-  await remove(ref(`/scores/${id}`));
-  await remove(ref(`/mgScores/${id}`));
-  addLog(`Team verwijderd: ${name}`);
-  showToast(`Team ${name} verwijderd`,'error');
-};
+document.getElementById('teamsOverview').addEventListener('click', async e => {
+  const btn=e.target.closest('.del-team'); if (!btn) return;
+  if (!confirm('Team '+btn.dataset.name+' verwijderen?')) return;
+  const id=btn.dataset.id;
+  await Promise.all([db.ref('/teams/'+id).remove(), db.ref('/scores/'+id).remove(), db.ref('/mgScores/'+id).remove()]);
+  addLog('Team verwijderd: '+btn.dataset.name);
+  toast(btn.dataset.name+' verwijderd','err');
+});
 
-// =====================================================
-// ADMIN: HOLES
-// =====================================================
-function renderHolesAdmin() {
-  const holes = Object.values(state.holes).sort((a,b)=>a.num-b.num);
-  document.getElementById('holeCount').textContent = `${holes.length} / 18`;
-  if (!holes.length) {
-    document.getElementById('holesAdminList').innerHTML = '<p style="color:var(--muted);font-size:14px;padding:10px 0">Nog geen holes.</p>';
-    return;
-  }
-  let html = '';
-  holes.forEach(h => {
-    html += `<div class="hole-admin-row">
-      <div class="hole-num-badge">${h.num}</div>
-      <div>
-        <div style="font-weight:600;font-size:13px">${esc(h.drink)||'–'}</div>
-        <div style="font-size:11px;color:var(--muted)">Par ${h.par}${h.note ? ' · '+esc(h.note) : ''}</div>
-      </div>
-      <div style="font-size:12px;color:var(--muted)"></div>
-      <button class="btn btn-danger btn-sm" onclick="deleteHole('${h.id}',${h.num})">✕</button>
-    </div>`;
-  });
-  document.getElementById('holesAdminList').innerHTML = html;
-}
+document.getElementById('addHoleBtn').addEventListener('click', async () => {
+  const drink=document.getElementById('newDrink').value.trim();
+  const par=parseInt(document.getElementById('newPar').value)||4;
+  const note=document.getElementById('newNote').value.trim();
+  if (!drink){ toast('Vul het drankje in','err'); return; }
+  const holes=H();
+  if (holes.length>=18){ toast('Max 18 holes','err'); return; }
+  const id='hole_'+Date.now();
+  await db.ref('/holes/'+id).set({id,num:holes.length+1,drink,par,note});
+  addLog(`Hole ${holes.length+1} aangemaakt: ${drink} (par ${par})`);
+  ['newDrink','newNote'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('newPar').value='4';
+  toast('Hole '+(holes.length+1)+' toegevoegd');
+});
 
-window.addHole = async function() {
-  const drink = document.getElementById('newHoleDrink').value.trim();
-  const par   = parseInt(document.getElementById('newHolePar').value)||4;
-  const note  = document.getElementById('newHoleNote').value.trim();
-  if (!drink) { showToast('Vul het drankje in','error'); return; }
-  const existing = Object.values(state.holes);
-  if (existing.length >= 18) { showToast('Maximaal 18 holes','error'); return; }
-  const num = existing.length + 1;
-  const id  = 'hole_' + Date.now();
-  await set(ref(`/holes/${id}`), { id, num, drink, par, note });
-  addLog(`Hole ${num} aangemaakt: ${drink} (par ${par})`);
-  document.getElementById('newHoleDrink').value = '';
-  document.getElementById('newHolePar').value = '4';
-  document.getElementById('newHoleNote').value = '';
-  showToast(`Hole ${num} toegevoegd`);
-};
+document.getElementById('holesAdminList').addEventListener('click', async e => {
+  const btn=e.target.closest('.del-hole'); if (!btn) return;
+  if (!confirm('Hole '+btn.dataset.num+' verwijderen?')) return;
+  const remaining=H().filter(h=>h.id!==btn.dataset.id);
+  await db.ref('/holes/'+btn.dataset.id).remove();
+  for (let i=0;i<remaining.length;i++) await db.ref('/holes/'+remaining[i].id+'/num').set(i+1);
+  addLog('Hole '+btn.dataset.num+' verwijderd');
+  toast('Hole '+btn.dataset.num+' verwijderd','err');
+});
 
-window.deleteHole = async function(id, num) {
-  if (!confirm(`Hole ${num} verwijderen?`)) return;
-  const holes = Object.values(state.holes).sort((a,b)=>a.num-b.num);
-  await remove(ref(`/holes/${id}`));
-  // renumber remaining
-  const remaining = holes.filter(h=>h.id!==id);
-  for (let i=0;i<remaining.length;i++) {
-    await update(ref(`/holes/${remaining[i].id}`), {num: i+1});
-  }
-  addLog(`Hole ${num} verwijderd`);
-  showToast(`Hole ${num} verwijderd`,'error');
-};
-
-// =====================================================
-// ADMIN: MINIGAMES
-// =====================================================
-function renderMgAdmin() {
-  const mgs = Object.values(state.minigames);
-  if (!mgs.length) {
-    document.getElementById('mgAdminList').innerHTML = '<p style="color:var(--muted);font-size:14px;padding:10px 0">Nog geen mini games.</p>';
-    return;
-  }
-  let html = '';
-  mgs.forEach(mg => {
-    html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
-      <div>
-        <div style="font-weight:600;font-size:14px">${esc(mg.name)}</div>
-        <div style="font-size:12px;color:var(--muted)">Max ${mg.maxPts} punten${mg.desc ? ' · '+esc(mg.desc.substring(0,40))+'...' : ''}</div>
-      </div>
-      <button class="btn btn-danger btn-sm" onclick="deleteMg('${mg.id}','${esc(mg.name)}')">✕</button>
-    </div>`;
-  });
-  document.getElementById('mgAdminList').innerHTML = html;
-}
-
-window.addMinigame = async function() {
-  const name   = document.getElementById('mgName').value.trim();
-  const desc   = document.getElementById('mgDesc').value.trim();
-  const maxPts = parseInt(document.getElementById('mgMaxPts').value)||10;
-  if (!name) { showToast('Vul een naam in','error'); return; }
-  const id = 'mg_' + Date.now();
-  await set(ref(`/minigames/${id}`), { id, name, desc, maxPts });
+document.getElementById('addMgBtn').addEventListener('click', async () => {
+  const name=document.getElementById('mgName').value.trim();
+  const desc=document.getElementById('mgDesc').value.trim();
+  const maxPts=parseInt(document.getElementById('mgMax').value)||10;
+  if (!name){ toast('Vul een naam in','err'); return; }
+  const id='mg_'+Date.now();
+  await db.ref('/minigames/'+id).set({id,name,desc,maxPts});
   addLog(`Mini game aangemaakt: ${name} (max ${maxPts} pt)`);
-  document.getElementById('mgName').value = '';
-  document.getElementById('mgDesc').value = '';
-  document.getElementById('mgMaxPts').value = '10';
-  showToast(`Mini game "${name}" toegevoegd`);
-};
+  ['mgName','mgDesc'].forEach(i=>document.getElementById(i).value='');
+  toast('Mini game "'+name+'" toegevoegd');
+});
 
-window.deleteMg = async function(id, name) {
-  if (!confirm(`Mini game "${name}" verwijderen?`)) return;
-  await remove(ref(`/minigames/${id}`));
-  addLog(`Mini game verwijderd: ${name}`);
-  showToast(`Mini game verwijderd`,'error');
-};
+document.getElementById('mgAdminList').addEventListener('click', async e => {
+  const btn=e.target.closest('.del-mg'); if (!btn) return;
+  if (!confirm('Mini game "'+btn.dataset.name+'" verwijderen?')) return;
+  await db.ref('/minigames/'+btn.dataset.id).remove();
+  addLog('Mini game verwijderd: '+btn.dataset.name);
+  toast('Mini game verwijderd','err');
+});
 
-// =====================================================
-// SETTINGS
-// =====================================================
-window.savePin = async function() {
-  const p = document.getElementById('newPin').value;
-  if (!/^\d{4}$/.test(p)) { showToast('Pincode moet 4 cijfers zijn','error'); return; }
-  await set(ref('/config/pin'), p);
+document.getElementById('savePinBtn').addEventListener('click', async () => {
+  const p=document.getElementById('newPin').value;
+  if (!/^\d{4}$/.test(p)){ toast('Pincode moet 4 cijfers zijn','err'); return; }
+  await db.ref('/config/pin').set(p);
   addLog('Pincode gewijzigd');
-  document.getElementById('newPin').value = '';
-  showToast('Pincode opgeslagen');
-};
+  document.getElementById('newPin').value='';
+  toast('Pincode opgeslagen');
+});
 
-window.resetAll = async function() {
-  if (!confirm('Weet je zeker dat je ALLES wilt resetten? Dit verwijdert alle teams, holes, scores en logs.')) return;
-  await set(ref('/'), { config: { pin: await getPin() } });
+document.getElementById('resetBtn').addEventListener('click', async () => {
+  if (!confirm('Weet je zeker dat je ALLES wilt resetten?')) return;
+  const pin=await getPin();
+  await db.ref('/').set({config:{pin}});
   addLog('Alles gereset');
-  showToast('Reset voltooid','error');
-};
+  toast('Reset voltooid','err');
+});
 
-async function getPin() {
-  const snap = await get(ref('/config/pin'));
-  return snap.val() || DEFAULT_PIN;
-}
-
-// =====================================================
-// PIN MODAL
-// =====================================================
-window.requestAdmin = function() {
-  if (adminUnlocked) { showPage('admin'); return; }
-  pinBuffer = '';
-  updatePinDots();
-  document.getElementById('pinError').textContent = '';
-  document.getElementById('pinModal').classList.remove('hidden');
-};
-
-window.closePinModal = function() {
-  document.getElementById('pinModal').classList.add('hidden');
-  pinBuffer = '';
-};
-
-window.pinPress = async function(k) {
-  if (k === 'clr') { pinBuffer = ''; updatePinDots(); return; }
-  if (pinBuffer.length >= 4) return;
-  pinBuffer += k;
-  updatePinDots();
-  if (pinBuffer.length === 4) {
-    const correct = await getPin();
-    if (pinBuffer === correct) {
-      adminUnlocked = true;
-      closePinModal();
-      showPage('admin');
-      renderTeamsAdmin();
-      renderHolesAdmin();
-      renderMgAdmin();
-    } else {
-      document.getElementById('pinError').textContent = 'Onjuiste pincode';
-      setTimeout(() => { pinBuffer = ''; updatePinDots(); document.getElementById('pinError').textContent=''; }, 900);
-    }
-  }
-};
-
-function updatePinDots() {
-  for (let i=0;i<4;i++) {
-    document.getElementById('d'+i).classList.toggle('filled', i < pinBuffer.length);
-  }
-}
-
-// =====================================================
-// UI HELPERS
-// =====================================================
-window.showPage = function(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+// ── NAVIGATION ────────────────────────────
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab,.bn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  const tabs = document.querySelectorAll('.nav-tab');
-  tabs.forEach(t => { if (t.getAttribute('onclick')?.includes("'"+id+"'")) t.classList.add('active'); });
-};
-
-window.switchAdminTab = function(id, btn) {
-  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('panel-'+id).classList.add('active');
-  btn.classList.add('active');
-};
-
-function showToast(msg, type='success') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show ' + type;
-  setTimeout(() => { t.className = 'toast'; }, 2800);
+  document.querySelectorAll(`[data-page="${id}"]`).forEach(b=>b.classList.add('active'));
 }
 
-function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+document.querySelectorAll('[data-page]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const page=btn.dataset.page;
+    if (page==='admin'){
+      if (adminUnlocked){ showPage('admin'); renderAdmin(); }
+      else openPin(()=>{ showPage('admin'); renderAdmin(); });
+    } else showPage(page);
+  });
+});
 
-// =====================================================
-// BOOT
-// =====================================================
-initListeners();
+document.querySelectorAll('.atab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const panel=btn.dataset.panel;
+    document.querySelectorAll('.apanel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.atab').forEach(b=>b.classList.remove('active'));
+    document.getElementById('panel-'+panel).classList.add('active');
+    btn.classList.add('active');
+  });
+});
+
+// ── PIN ───────────────────────────────────
+let pinCallback = null;
+function openPin(cb){ pinCallback=cb; pinBuf=''; updateDots(); document.getElementById('pinErr').textContent=''; document.getElementById('pinOverlay').classList.remove('hidden'); }
+
+document.querySelectorAll('.pk').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const k=btn.dataset.k;
+    if (k==='close'){ document.getElementById('pinOverlay').classList.add('hidden'); return; }
+    if (k==='clr'){ pinBuf=''; updateDots(); return; }
+    if (pinBuf.length>=4) return;
+    pinBuf+=k; updateDots();
+    if (pinBuf.length===4){
+      const correct=await getPin();
+      if (pinBuf===correct){
+        adminUnlocked=true;
+        document.getElementById('pinOverlay').classList.add('hidden');
+        if (pinCallback){ pinCallback(); pinCallback=null; }
+      } else {
+        document.getElementById('pinErr').textContent='Onjuiste pincode';
+        setTimeout(()=>{ pinBuf=''; updateDots(); document.getElementById('pinErr').textContent=''; },900);
+      }
+    }
+  });
+});
+
+function updateDots(){ for(let i=0;i<4;i++) document.getElementById('pd'+i).classList.toggle('on',i<pinBuf.length); }
+
+document.getElementById('pinOverlay').addEventListener('click', e => {
+  if (e.target===document.getElementById('pinOverlay')) document.getElementById('pinOverlay').classList.add('hidden');
+});
 </script>
 </body>
 </html>
