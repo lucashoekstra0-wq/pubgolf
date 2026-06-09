@@ -18,6 +18,14 @@
   --safe-top: env(safe-area-inset-top);
   --safe-bot: env(safe-area-inset-bottom);
 }
+body.light{
+  --bg:#f4f5f7;--bg2:#ffffff;--bg3:#eceef1;--card:#ffffff;
+  --border:#d8dce2;--accent:#5a8a00;--accent2:#1a7fa8;--accent3:#c25e1f;
+  --text:#1a1e28;--muted:#7a828f;--danger:#cc3a3a;--success:#1f8a6a;
+}
+body.light .logo span{color:#1a1e28}
+body.light .tsc-btn.m,body.light .mw-btn.m{background:rgba(204,58,58,.15)}
+body.light .tsc-btn.p,body.light .mw-btn.p{background:rgba(90,138,0,.15)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{background:var(--bg);color:var(--text);font-family:var(--fb);overflow-x:hidden}
@@ -35,7 +43,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);overflow-x:hid
 .live-lbl.on{color:var(--success)}
 .admin-badge{background:rgba(200,240,70,.2);border:1px solid var(--accent);color:var(--accent);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer}
 .top-tabs{display:flex;gap:3px}
-.nav-tab{padding:7px 12px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;transition:all .18s;white-space:nowrap}
+.nav-tab{padding:10px 14px;border-radius:8px;min-height:40px;border:none;background:transparent;color:var(--muted);font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;transition:all .18s;white-space:nowrap}
 .nav-tab:hover{background:var(--bg3);color:var(--text)}
 .nav-tab.active{background:var(--accent);color:#0d0f14;font-weight:600}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
@@ -109,12 +117,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);overflow-x:hid
 .tsc-btn.m{background:rgba(240,90,90,.22);color:var(--danger)}
 .tsc-btn.p{background:rgba(200,240,70,.22);color:var(--accent)}
 .tsc-btn:active{transform:scale(.78)}
-.tsc-val{width:68px;text-align:center;font-family:var(--fd);font-size:56px;color:var(--text);line-height:1}
+.tsc-val{width:68px;text-align:center;font-family:var(--fd);font-size:56px;color:var(--text);line-height:1;cursor:pointer;border-radius:8px;transition:background .15s}
+.tsc-val:active{background:var(--bg3)}
 .tsc-val.z{color:var(--muted)}
 .tsc-diff{text-align:center;font-size:13px;font-weight:600;min-height:18px;padding:2px 0}
 .tsc-diff.under{color:var(--success)}
 .tsc-diff.over{color:var(--danger)}
 .tsc-diff.eq{color:var(--muted)}
+.penalty-row{display:flex;gap:5px;justify-content:center;margin-top:4px}
+.pen-btn{flex:1;padding:8px 4px;border:1px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--accent3);font-family:var(--fb);font-size:13px;font-weight:600;cursor:pointer;min-height:40px;transition:transform .1s}
+.pen-btn:active{transform:scale(.9);background:rgba(240,134,74,.18)}
 
 /* ── NAV BUTTONS ── */
 .rest-nav{display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap}
@@ -146,6 +158,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);overflow-x:hid
 .lb-info{flex:1;min-width:0}
 .lb-team{font-size:16px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lb-players{font-size:12px;color:var(--muted)}
+.lb-par{font-size:12px;font-weight:600;margin-top:2px}
 .lb-stats{display:flex;gap:12px;flex-shrink:0}
 .lb-stat{display:flex;flex-direction:column;align-items:flex-end}
 .lb-sv{font-family:var(--fd);font-size:22px}
@@ -160,7 +173,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);overflow-x:hid
 .mg-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .mg-name{flex:1;font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .mw{display:flex;align-items:center;gap:4px}
-.mw-btn{width:44px;height:44px;border:none;border-radius:8px;font-size:24px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-user-select:none;user-select:none;transition:transform .1s}
+.mw-btn{width:48px;height:48px;border:none;border-radius:8px;font-size:24px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;-webkit-user-select:none;user-select:none;transition:transform .1s}
 .mw-btn.m{background:rgba(240,90,90,.2);color:var(--danger)}
 .mw-btn.p{background:rgba(200,240,70,.2);color:var(--accent)}
 .mw-btn:active{transform:scale(.8)}
@@ -176,6 +189,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);overflow-x:hid
 .la{background:rgba(70,200,240,.15);color:var(--accent2)}
 .lm{background:rgba(240,134,74,.15);color:var(--accent3)}
 .log-msg{font-size:13px;color:var(--text);line-height:1.4;flex:1;min-width:150px}
+.log-who{display:inline-block;margin-left:8px;font-size:11px;color:var(--accent2);background:rgba(70,200,240,.12);padding:1px 8px;border-radius:20px;font-weight:600}
 
 /* ── ADMIN ── */
 .admin-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px;overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -200,6 +214,13 @@ textarea.form-i{resize:vertical;min-height:68px}
 .btn-s{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
 .btn-sm{padding:8px 12px;font-size:13px;min-height:38px}
 .divider{border:none;border-top:1px solid var(--border);margin:18px 0}
+.theme-toggle{display:flex;gap:8px}
+.theme-opt{flex:1;padding:14px;border-radius:10px;border:2px solid var(--border);background:var(--bg3);color:var(--text);font-family:var(--fb);font-size:15px;font-weight:600;cursor:pointer;transition:all .18s;min-height:50px}
+.theme-opt.active{border-color:var(--accent);background:rgba(200,240,70,.12);color:var(--accent)}
+.theme-opt:active{transform:scale(.96)}
+.qr-box{background:#fff;border-radius:12px;padding:16px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+.qr-box img{border-radius:8px;display:block}
+.qr-url{font-size:12px;color:#333;word-break:break-all;font-family:monospace}
 .item-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);gap:10px}
 .item-row:last-child{border-bottom:none}
 .item-info{flex:1;min-width:0}
@@ -233,6 +254,23 @@ textarea.form-i{resize:vertical;min-height:68px}
 
 /* ── LOCKED OVERLAY ── */
 .score-locked-msg{background:rgba(240,134,74,.1);border:1px solid rgba(240,134,74,.3);border-radius:var(--r);padding:14px 18px;text-align:center;color:var(--accent3);font-size:14px;margin-bottom:16px}
+
+/* ── CHAMPION ── */
+.champ-modal{background:var(--bg2);border:2px solid var(--accent);border-radius:24px;padding:36px 28px;max-width:380px;width:100%;text-align:center;position:relative;overflow:hidden}
+.champ-trophy{font-size:72px;animation:bounce 1.2s ease infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.champ-label{font-family:var(--fd);font-size:18px;color:var(--muted);letter-spacing:.1em;margin-top:8px}
+.champ-name{font-family:var(--fd);font-size:46px;color:var(--accent);line-height:1.05;margin:6px 0}
+.champ-players{font-size:14px;color:var(--text);margin-bottom:8px}
+.champ-score{font-family:var(--fd);font-size:22px;color:var(--accent2)}
+.champ-podium{margin-top:20px;display:flex;flex-direction:column;gap:6px}
+.champ-pod-row{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg3);border-radius:10px;font-size:14px}
+.champ-pod-rank{font-family:var(--fd);font-size:20px;width:28px;flex-shrink:0}
+.champ-pod-name{flex:1;text-align:left;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.champ-pod-score{font-family:var(--fd);font-size:18px;color:var(--accent)}
+.champ-confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.confetti-piece{position:absolute;width:10px;height:10px;top:-20px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(600px) rotate(720deg);opacity:0}}
 
 /* ── EMPTY ── */
 .empty{text-align:center;padding:40px 16px;color:var(--muted)}
@@ -382,6 +420,23 @@ textarea.form-i{resize:vertical;min-height:68px}
   <div class="apanel" id="panel-settings">
     <div class="card" style="max-width:400px">
       <div class="card-hdr"><div class="card-ttl">INSTELLINGEN</div></div>
+      <div class="form-g">
+        <label class="form-l">Weergave</label>
+        <div class="theme-toggle">
+          <button class="theme-opt" data-theme="dark">🌙 Donker</button>
+          <button class="theme-opt" data-theme="light">☀️ Licht</button>
+        </div>
+      </div>
+      <hr class="divider"/>
+      <div class="form-g">
+        <label class="form-l">Deel de app</label>
+        <div class="qr-box" id="qrBox">
+          <img id="qrImg" alt="QR code" width="160" height="160"/>
+          <div class="qr-url" id="qrUrl"></div>
+          <button class="btn btn-s btn-sm" id="copyLinkBtn" style="margin-top:8px">📋 Link kopiëren</button>
+        </div>
+      </div>
+      <hr class="divider"/>
       <button class="btn btn-s" id="logoutBtn" style="margin-bottom:16px;width:100%">🚪 Uitloggen</button>
       <hr class="divider"/>
       <p style="color:var(--muted);font-size:13px;margin-bottom:12px">Reset verwijdert alles behalve admins.</p>
@@ -434,6 +489,20 @@ textarea.form-i{resize:vertical;min-height:68px}
       <button class="btn btn-s" id="renameCancelBtn">Annuleren</button>
       <button class="btn btn-p" id="renameSaveBtn">Opslaan</button>
     </div>
+  </div>
+</div>
+
+<!-- CHAMPION OVERLAY -->
+<div class="overlay hidden" id="champOverlay">
+  <div class="champ-modal">
+    <div class="champ-confetti" id="champConfetti"></div>
+    <div class="champ-trophy">🏆</div>
+    <div class="champ-label">DE WINNAAR IS</div>
+    <div class="champ-name" id="champName">–</div>
+    <div class="champ-players" id="champPlayers"></div>
+    <div class="champ-score" id="champScore"></div>
+    <div class="champ-podium" id="champPodium"></div>
+    <button class="btn btn-p" id="champCloseBtn" style="margin-top:20px">Sluiten</button>
   </div>
 </div>
 
@@ -500,6 +569,7 @@ function allHoles(){
   return holes;
 }
 function slg(tid){ return allHoles().reduce((s,h)=>s+(parseInt((S.scores[tid]||{})[h.id])||0),0); }
+function totalPar(tid){ return allHoles().filter(h=>(S.scores[tid]||{})[h.id]).reduce((s,h)=>s+(parseInt(h.par)||4),0); }
 function mgp(tid){ return Object.values(S.mgScores[tid]||{}).reduce((s,v)=>s+(parseInt(v)||0),0); }
 function playerList(t){ return [t.p1,t.p2,t.p3].filter(Boolean).join(' & '); }
 
@@ -511,7 +581,8 @@ function toast(msg,type='ok'){
 async function addLog(msg,type='admin'){
   const now=new Date();
   const time=now.toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+' '+now.toLocaleDateString('nl-NL',{day:'2-digit',month:'2-digit'});
-  db.ref('/logs').push({msg,type,time,ts:Date.now()});
+  const who=currentAdmin?currentAdmin.name:'Onbekend';
+  db.ref('/logs').push({msg,type,time,who,ts:Date.now()});
 }
 
 // ── RENDER ALL ────────────────────────────
@@ -587,10 +658,15 @@ function renderRestView(rests, teams){
         </div>
         <div class="tsc-widget">
           <button class="tsc-btn m" data-tid="${t.id}" data-hid="${h.id}" data-d="-1">−</button>
-          <div class="tsc-val${v===0?' z':''}">${v===0?'–':v}</div>
+          <div class="tsc-val${v===0?' z':''}" data-tid="${t.id}" data-hid="${h.id}" title="Tik om in te typen">${v===0?'–':v}</div>
           <button class="tsc-btn p" data-tid="${t.id}" data-hid="${h.id}" data-d="1">+</button>
         </div>
         ${diffHtml}
+        ${isAdmin()?`<div class="penalty-row">
+          <button class="pen-btn" data-tid="${t.id}" data-hid="${h.id}" data-pen="1" title="Knoeien +1">🍺+1</button>
+          <button class="pen-btn" data-tid="${t.id}" data-hid="${h.id}" data-pen="2" title="Vallen/morsen +2">💦+2</button>
+          <button class="pen-btn" data-tid="${t.id}" data-hid="${h.id}" data-pen="3" title="Cheaten +3">🚫+3</button>
+        </div>`:''}
       </div>`;
     }).join('');
 
@@ -640,7 +716,7 @@ function renderRestView(rests, teams){
   document.getElementById('btnPrev')?.addEventListener('click',()=>{currentRest--;renderRestView(rests,teams);});
   document.getElementById('btnNext')?.addEventListener('click',()=>{
     if(!isLast){currentRest++;renderRestView(rests,teams);}
-    else{showPage('leaderboard');toast('Spel afgerond! 🏆');}
+    else{showChampion();}
   });
   document.getElementById('restEditBtn')?.addEventListener('click',()=>{
     openRename(r.name, async newName=>{
@@ -668,6 +744,33 @@ function renderRestView(rests, teams){
       addLog(`${S.teams[tid]?.name} – Hole ${hid}: ${next} slagen`,'score');
     });
   });
+  // tap-to-type: tik op het cijfer om direct in te voeren
+  document.getElementById('sbWrap').querySelectorAll('.tsc-val').forEach(el=>{
+    el.addEventListener('click', async ()=>{
+      if(!isAdmin()){toast('Log eerst in als admin','err');return;}
+      const{tid,hid}=el.dataset;
+      const cur=parseInt((S.scores[tid]||{})[hid])||0;
+      const input=prompt('Aantal slagen voor '+(S.teams[tid]?.name||'team')+':', cur||'');
+      if(input===null) return;
+      const n=parseInt(input);
+      if(isNaN(n)||n<0){toast('Ongeldig getal','err');return;}
+      await db.ref(`/scores/${tid}/${hid}`).set(n||null);
+      addLog(`${S.teams[tid]?.name} – Hole ${hid}: ${n} slagen`,'score');
+    });
+  });
+  // strafslagen
+  document.getElementById('sbWrap').querySelectorAll('.pen-btn').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      if(!isAdmin()){toast('Log eerst in als admin','err');return;}
+      const{tid,hid,pen}=btn.dataset;
+      const cur=parseInt((S.scores[tid]||{})[hid])||0;
+      const next=cur+parseInt(pen);
+      await db.ref(`/scores/${tid}/${hid}`).set(next);
+      const labels={'1':'Knoeien','2':'Vallen/morsen','3':'Cheaten'};
+      addLog(`${S.teams[tid]?.name} – Hole ${hid}: strafslag ${labels[pen]} (+${pen})`,'score');
+      toast('Strafslag +'+pen);
+    });
+  });
 }
 
 // ── LEADERBOARD ───────────────────────────
@@ -678,16 +781,22 @@ function renderLB(){
     .map(r=>({...r,comb:r.sl-r.mp}))
     .sort((a,b)=>{if(!a.sl&&!b.sl)return 0;if(!a.sl)return 1;if(!b.sl)return-1;return a.comb-b.comb;});
   const medals=['gold','silver','bronze'];
-  document.getElementById('lbList').innerHTML=ranked.map((r,i)=>`
-    <div class="lb-row ${medals[i]||''}">
+  document.getElementById('lbList').innerHTML=ranked.map((r,i)=>{
+    const par=totalPar(r.t.id);
+    const pd=r.sl?(r.sl-par):0;
+    const pdTxt=!r.sl?'–':pd===0?'E':pd>0?'+'+pd:''+pd;
+    const pdCls=pd<0?'var(--success)':pd>0?'var(--danger)':'var(--muted)';
+    return `<div class="lb-row ${medals[i]||''}">
       <div class="lb-rank ${medals[i]||''}">${i+1}</div>
-      <div class="lb-info"><div class="lb-team">${esc(r.t.name)}</div><div class="lb-players">${esc(playerList(r.t))}</div></div>
+      <div class="lb-info"><div class="lb-team">${esc(r.t.name)}</div><div class="lb-players">${esc(playerList(r.t))}</div>
+        ${r.sl?`<div class="lb-par" style="color:${pdCls}">${pdTxt} t.o.v. par</div>`:''}
+      </div>
       <div class="lb-stats">
         <div class="lb-stat"><div class="lb-sv" style="color:var(--accent)">${r.sl||'–'}</div><div class="lb-sl">Slagen</div></div>
         <div class="lb-stat"><div class="lb-sv" style="color:var(--accent3)">${r.mp?'+'+r.mp:'0'}</div><div class="lb-sl">MG</div></div>
         <div class="lb-stat"><div class="lb-sv">${r.sl?r.comb:'–'}</div><div class="lb-sl">Totaal</div></div>
       </div>
-    </div>`).join('');
+    </div>`;}).join('');
 }
 
 // ── MINIGAMES ─────────────────────────────
@@ -706,7 +815,7 @@ function renderMG(){
             <div class="mg-name">${esc(t.name)}</div>
             <div class="mw">
               <button class="mw-btn m" data-tid="${t.id}" data-mgid="${mg.id}" data-max="${mg.maxPts}" data-d="-1">−</button>
-              <div class="mw-v">${v}</div>
+              <div class="mw-v" data-tid="${t.id}" data-mgid="${mg.id}" data-max="${mg.maxPts}" style="cursor:pointer" title="Tik om in te typen">${v}</div>
               <button class="mw-btn p" data-tid="${t.id}" data-mgid="${mg.id}" data-max="${mg.maxPts}" data-d="1">+</button>
             </div>
             <div class="mw-max">/ ${mg.maxPts}</div>
@@ -716,13 +825,29 @@ function renderMG(){
 }
 
 document.getElementById('mgList').addEventListener('click', async e=>{
-  const btn=e.target.closest('.mw-btn'); if(!btn) return;
-  if(!isAdmin()){toast('Log eerst in als admin','err');return;}
-  const{tid,mgid,max,d}=btn.dataset;
-  const cur=parseInt((S.mgScores[tid]||{})[mgid])||0;
-  const next=Math.min(parseInt(max),Math.max(0,cur+parseInt(d)));
-  await db.ref(`/mgScores/${tid}/${mgid}`).set(next);
-  addLog(`${S.teams[tid]?.name} – ${S.minigames[mgid]?.name}: ${next} punten`,'mini');
+  const btn=e.target.closest('.mw-btn');
+  if(btn){
+    if(!isAdmin()){toast('Log eerst in als admin','err');return;}
+    const{tid,mgid,max,d}=btn.dataset;
+    const cur=parseInt((S.mgScores[tid]||{})[mgid])||0;
+    const next=Math.min(parseInt(max),Math.max(0,cur+parseInt(d)));
+    await db.ref(`/mgScores/${tid}/${mgid}`).set(next);
+    addLog(`${S.teams[tid]?.name} – ${S.minigames[mgid]?.name}: ${next} punten`,'mini');
+    return;
+  }
+  const val=e.target.closest('.mw-v');
+  if(val){
+    if(!isAdmin()){toast('Log eerst in als admin','err');return;}
+    const{tid,mgid,max}=val.dataset;
+    const cur=parseInt((S.mgScores[tid]||{})[mgid])||0;
+    const input=prompt('Punten (max '+max+') voor '+(S.teams[tid]?.name||'team')+':', cur||'');
+    if(input===null) return;
+    let n=parseInt(input);
+    if(isNaN(n)||n<0){toast('Ongeldig getal','err');return;}
+    n=Math.min(parseInt(max),n);
+    await db.ref(`/mgScores/${tid}/${mgid}`).set(n);
+    addLog(`${S.teams[tid]?.name} – ${S.minigames[mgid]?.name}: ${n} punten`,'mini');
+  }
 });
 
 // ── LOGBOOK ───────────────────────────────
@@ -732,7 +857,8 @@ function renderLog(){
   document.getElementById('logList').innerHTML=entries.slice(0,150).map(e=>{
     const cls=e.type==='score'?'ls':e.type==='mini'?'lm':'la';
     const lbl=e.type==='score'?'Score':e.type==='mini'?'Mini game':'Beheer';
-    return`<div class="log-item"><span class="log-time">${esc(e.time)}</span><span class="log-badge ${cls}">${lbl}</span><span class="log-msg">${esc(e.msg)}</span></div>`;
+    const who=e.who?`<span class="log-who">${esc(e.who)}</span>`:'';
+    return`<div class="log-item"><span class="log-time">${esc(e.time)}</span><span class="log-badge ${cls}">${lbl}</span><span class="log-msg">${esc(e.msg)}${who}</span></div>`;
   }).join('');
 }
 
@@ -916,6 +1042,82 @@ document.getElementById('adminsOverview').addEventListener('click', async e=>{
 document.getElementById('logoutBtn').addEventListener('click',()=>{
   currentAdmin=null; renderAll(); showPage('score'); toast('Uitgelogd');
 });
+
+// ── CHAMPION SCREEN ───────────────────────
+function showChampion(){
+  const teams=T();
+  if(!teams.length){showPage('leaderboard');return;}
+  const ranked=teams.map(t=>({t,sl:slg(t.id),mp:mgp(t.id)}))
+    .map(r=>({...r,comb:r.sl-r.mp}))
+    .filter(r=>r.sl>0)
+    .sort((a,b)=>a.comb-b.comb);
+  if(!ranked.length){showPage('leaderboard');toast('Nog geen scores ingevuld');return;}
+  const w=ranked[0];
+  document.getElementById('champName').textContent=w.t.name;
+  document.getElementById('champPlayers').textContent=playerList(w.t);
+  document.getElementById('champScore').textContent=w.comb+' punten';
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('champPodium').innerHTML=ranked.slice(0,3).map((r,i)=>`
+    <div class="champ-pod-row">
+      <div class="champ-pod-rank">${medals[i]}</div>
+      <div class="champ-pod-name">${esc(r.t.name)}</div>
+      <div class="champ-pod-score">${r.comb}</div>
+    </div>`).join('');
+  // confetti
+  const cc=document.getElementById('champConfetti');
+  const colors=['#c8f046','#46c8f0','#f0864a','#46c8a0','#f05a5a'];
+  let conf='';
+  for(let i=0;i<40;i++){
+    const left=Math.random()*100;
+    const delay=Math.random()*2;
+    const dur=2+Math.random()*2;
+    const col=colors[Math.floor(Math.random()*colors.length)];
+    conf+=`<div class="confetti-piece" style="left:${left}%;background:${col};animation-duration:${dur}s;animation-delay:${delay}s;border-radius:${Math.random()>.5?'50%':'2px'}"></div>`;
+  }
+  cc.innerHTML=conf;
+  document.getElementById('champOverlay').classList.remove('hidden');
+}
+document.getElementById('champCloseBtn').addEventListener('click',()=>{
+  document.getElementById('champOverlay').classList.add('hidden');
+  showPage('leaderboard');
+});
+document.getElementById('champOverlay').addEventListener('click',e=>{
+  if(e.target===document.getElementById('champOverlay')){
+    document.getElementById('champOverlay').classList.add('hidden');
+    showPage('leaderboard');
+  }
+});
+
+// ── THEME ─────────────────────────────────
+function applyTheme(theme){
+  if(theme==='light') document.body.classList.add('light');
+  else document.body.classList.remove('light');
+  document.querySelectorAll('.theme-opt').forEach(b=>b.classList.toggle('active',b.dataset.theme===theme));
+  try{ localStorage.setItem('pubgolf_theme',theme); }catch(e){}
+}
+document.querySelectorAll('.theme-opt').forEach(btn=>{
+  btn.addEventListener('click',()=>applyTheme(btn.dataset.theme));
+});
+// load saved theme on startup
+(function(){
+  let saved='dark';
+  try{ saved=localStorage.getItem('pubgolf_theme')||'dark'; }catch(e){}
+  applyTheme(saved);
+})();
+
+// ── QR / SHARE ────────────────────────────
+(function(){
+  const url=window.location.href.split('#')[0];
+  const qrImg=document.getElementById('qrImg');
+  if(qrImg) qrImg.src='https://api.qrserver.com/v1/create-qr-code/?size=160x160&data='+encodeURIComponent(url);
+  const qrUrl=document.getElementById('qrUrl');
+  if(qrUrl) qrUrl.textContent=url;
+  const copyBtn=document.getElementById('copyLinkBtn');
+  if(copyBtn) copyBtn.addEventListener('click',async()=>{
+    try{ await navigator.clipboard.writeText(url); toast('Link gekopieerd 📋'); }
+    catch(e){ toast('Kon niet kopiëren','err'); }
+  });
+})();
 
 document.getElementById('resetBtn').addEventListener('click', async()=>{
   if(!confirm('Weet je zeker dat je alles wilt resetten? (Admins blijven behouden)')) return;
